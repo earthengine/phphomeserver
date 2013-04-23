@@ -8,7 +8,7 @@
 <body>
 	<div id="wrapper">
 		<div id="banner">
-			<h1>My Photo Album</h1>
+			<h1><?php echo $bannerText; ?></h1>
 		</div>
 		<div id="nav">
             <a href="indexEnglish.php">英文</a>

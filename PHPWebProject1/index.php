@@ -1,9 +1,12 @@
-<?php
-$page_title="Home";
-$page_content="		<div id='content'>
-			<h2>Welcome</h2>
-			<p>显示中文</p>
-
-		</div>";
-include('Page.inc');
+<?php 
+$refresh = "1,url=";
+$lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+if($lang=="cn") $refresh .= "indexChinese.php";
+else $refresh .= "indexEnglish.php";
 ?>
+<html>
+<head>
+    <meta http-equiv="refresh" content="<?php echo $refresh; ?>">
+</head>
+<body />
+</html>
