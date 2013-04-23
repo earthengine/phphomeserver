@@ -1,0 +1,62 @@
+﻿div#wrapper{
+	position:relative;
+	width:1000px;
+	margin:auto;}
+
+div#banner{
+	position:absolute;
+	width:100%;
+	height:150px;
+	background-color:black;
+	color:white;}
+
+div#banner h1{
+	font: bold 48pt sans-serif;
+	margin-left:20px}
+
+div#nav{
+	position:absolute;
+	top:150px;
+	width:120px;
+	height:700px;
+	margin-top:20px;
+	border-right:1px solid black;}
+
+div#nav a{
+	display:block;
+	font:16pt/20pt sans-serif;
+	text-decoration:none;
+	}
+
+a:link {
+    color: gold;
+}
+a:visited {
+    color: teal;
+}
+a:hover {
+    color: aqua;
+}
+a:active {
+    color: maroon;
+}
+
+div#content{
+	position:absolute;
+	top:150px;
+	left:120px;
+	height:700px;
+	margin-top:20px;
+	padding-left:20px;}
+
+#content p {
+    color: gray;
+}
+
+div#footer{
+	position:absolute;
+	top:870px;
+	width:100%;
+	border-top:1px solid black;
+    font: lighter x-small cursive;
+	}
