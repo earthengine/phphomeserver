@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "PHPHomeServer", "PHPWebProject1\PHPHomeServer.phpproj", "{0FF5E82A-FC53-4C6F-8B47-905EE40E710A}"
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "PHPHomeAlbumCode", "PHPWebProject1\PHPHomeAlbumCode.phpproj", "{0FF5E82A-FC53-4C6F-8B47-905EE40E710A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
