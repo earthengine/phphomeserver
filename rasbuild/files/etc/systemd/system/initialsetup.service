@@ -1,0 +1,8 @@
+[Unit]
+Description=Raspberry Server Initialize Service
+
+[Service]
+ExecStart=/bin/bash /root/startup.sh
+
+[Install]
+WantedBy=multi-user.target
