@@ -35,4 +35,5 @@ ntp:x:87:
 uuidd:x:68:
 systemd-journal:x:190:
 avahi:x:84:
+ldap:x:439:
 user:x:1000:joe
