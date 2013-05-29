@@ -5,12 +5,22 @@ else
 	export EDITOR="./$0"
 	visudo
 	locale-gen
-	netctl start ethernet-dhcp
-	netctl enable ethernet-dhcp
+	timedatectl set-timezone Australia/Melbourne
+	netctl enable ethernet-static
+	sed -e 's/MYGROUP/WORKGROUP/g' /etc/samba/smb.conf.default > /etc/samba/smb.conf
 	systemctl enable openntpd sshd lighttpd
+	systemctl disable initialsetup.service
 	parted /dev/mmcblk0 --script mkpart primary ext4 1878MB $(parted /dev/mmcblk0 --script print | grep '^Disk' | cut -d ' ' -f 3)
-	groupadd -g 439 ldap &>/dev/null
-	useradd -u 439 -g ldap -d /var/lib/openldap -s /bin/false ldap &>/dev/null
+	mkfs.ext4 /dev/mmcblk0p3
+	mount /dev/mmcblk0p3 /mnt
+	mkdir /mnt/ftp
+	mkdir /mnt/http
+	chgrp ftp /mnt/ftp
+	umount /mnt
+	sync
+	mkdir /router
+	echo "/dev/mmcblk0p3 /srv ext4 defaults 0 0" >> /etc/fstab
+	echo "//10.0.0.137/Disk_a1/Shared /router cifs defaults 0 0" >> /etc/fstab
 	rm /root/startup.sh
-	reboot
+	systemctl reboot
 fi

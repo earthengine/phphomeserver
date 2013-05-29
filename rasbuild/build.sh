@@ -1,52 +1,65 @@
+if [ "$1" == "" ]; then
+	echo "Usage: /bin/bash build.sh <target IP from 139-254>"
+	exit 1
+fi
 HOME=$(pwd)
+IP=$1
 echo $HOME
 ROOT=/root/archroot
 FILES=$HOME/files
 echo $ROOT
-PACKAGES="linux-raspberrypi linux-firmware raspberrypi-firmware systemd-sysvcompat less iputils procps-ng syslog-ng"
-PACKAGES="$PACKAGES man man-db grep dialog psmisc which sudo dhcpcd ifplugd net-tools netctl "
-PACKAGES="$PACKAGES openntpd openssh smbclient nano openldap aria2 parted"
-PACKAGES="$PACKAGES lighttpd ssmtp fcgi php php-cgi sqlite imagemagick"
+PACKAGES="linux-raspberrypi linux-firmware raspberrypi-firmware less iputils procps-ng"
+PACKAGES="$PACKAGES man grep dialog libsigsegv psmisc which sudo dhcpcd ifplugd net-tools netctl"
+PACKAGES="$PACKAGES openntpd openssh bind samba nano openldap aria2 parted"
+PACKAGES="$PACKAGES lighttpd ssmtp fcgi php php-cgi sqlite imagemagick "
+PACKAGES="$PACKAGES binutils bison cloog fakeroot file flex gcc gettext git "
+PACKAGES="$PACKAGES autoconf automake linux-headers-raspberrypi pkg-config tar patch"
+PACKAGES="$PACKAGES pacman pacman-mirrorlist"
 CACHE=$HOME/pacman_cache
 DB=$HOME/pacman_db
 
-
 function doInstall(){
-DB_TEMP=$(mktemp -d)
-echo $DB_TEMP
-sed -e "s@/etc/pacman.d/mirrorlist@$FILES/mirrorlist@g" $FILES/pacman.conf > $DB_TEMP/pacman.conf
-CONF=$DB_TEMP/pacman.conf
+sed -e "s@/etc/pacman.d/mirrorlist@$FILES/mirrorlist@g" $FILES/pacman.conf > $ROOT/pacman.conf
+CONF=$ROOT/pacman.conf
 PACMAN_BASE="pacman --root $ROOT --cachedir $CACHE --config $CONF"
-PACMAN="$PACMAN_BASE --dbpath=$DB_TEMP"
+PACMAN=$PACMAN_BASE
+DB_TEMP=$ROOT/var/lib/pacman
+install -d $ROOT/var/lib/pacman
+install -d $ROOT/var/cache/pacman/pkg
 $PACMAN_BASE --dbpath=$DB -Sy || return 0
 cp -R $DB/* $DB_TEMP/ || return 0
-$PACMAN -S filesystem licenses gcc-libs || return 0
+#DB_TEMP=$(mktemp -d)
+#echo $DB_TEMP
+#sed -e "s@/etc/pacman.d/mirrorlist@$FILES/mirrorlist@g" $FILES/pacman.conf > $DB_TEMP/pacman.conf
+#CONF=$DB_TEMP/pacman.conf
+#PACMAN="$PACMAN_BASE --dbpath=$DB_TEMP"
+#$PACMAN_BASE --dbpath=$DB -Sy || return 0
+#cp -R $DB/* $DB_TEMP/ || return 0
+$PACMAN -S licenses man-db systemd || return 0
 $PACMAN -S $PACKAGES || return 0
 $PACMAN -U /home/joe/php-imagick-3.0.1-4-armv6h.pkg.tar.xz || return 0
 
-cp -v {$FILES,$ROOT}/boot/cmdline.txt
-cp -v {$FILES,$ROOT}/boot/config.txt
-echo '/dev/mmcblk0p1  /boot           vfat    defaults        0       0' >> $ROOT/etc/fstab
-cp -v {$FILES,$ROOT}/etc/passwd
-chmod 644 $ROOT/etc/passwd
-cp -v {$FILES,$ROOT}/etc/group
-chmod 644 $ROOT/etc/group
-cp -v {$FILES,$ROOT}/etc/locale.conf
-chmod 644 $ROOT/etc/locale.conf
-cp -v {$FILES,$ROOT}/etc/locale.gen
-chmod 644 $ROOT/etc/locale.gen
-cp -v {$FILES,$ROOT}/etc/shadow
-chmod 640 $ROOT/etc/shadow
-cp -v $ROOT/etc/netctl/{examples/,}ethernet-dhcp
+install -v {$FILES,$ROOT}/boot/cmdline.txt
+install -v {$FILES,$ROOT}/boot/config.txt
+install -v --mode=644 {$FILES,$ROOT}/etc/passwd
+install -v --mode=644 {$FILES,$ROOT}/etc/group
+install -v --mode=644 {$FILES,$ROOT}/etc/locale.conf
+install -v --mode=644 {$FILES,$ROOT}/etc/locale.gen
+install -v --mode=640 {$FILES,$ROOT}/etc/shadow
+install -v --mode=644 {$FILES,$ROOT}/etc/netctl/ethernet-static
+install -v --mode=640 {$FILES,$ROOT}/etc/openldap/slapd.conf
+sed -i "s/10.0.0.139/10.0.0.${IP}/g" $ROOT/etc/netctl/ethernet-static
 cp -v $FILES/etc/ssh/* $ROOT/etc/ssh
 cp -v {$FILES,$ROOT/root}/startup.sh
-cp -v {$FILES,$ROOT}/etc/systemd/system/initialsetup.service
-chmod +x $ROOT/root/startup.sh
-install -d $ROOT/home/joe
+install -v --mode=744 {$FILES,$ROOT}/etc/systemd/system/initialsetup.service
+install -dv {$FILES,$ROOT}/etc/systemd/system/basic.target.wants
+ln -sv $ROOT/etc/systemd/system/{initialsetup.service,basic.target.wants/}
+install -d -o 1000 $ROOT/home/joe
 
 echo "raspserver" > $ROOT/etc/hostname
 echo "include /etc/lo.so.conf.d/*.conf" >> $ROOT/etc/lo.so.conf
 $PACMAN -Q > $HOME/targetlist
+rm $ROOT/pacman.conf
 chown joe $HOME/targetlist
 }
 

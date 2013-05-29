@@ -5,4 +5,4 @@ Description=Raspberry Server Initialize Service
 ExecStart=/bin/bash /root/startup.sh
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=basic.target
